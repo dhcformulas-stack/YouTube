@@ -5,6 +5,7 @@ from pipeline.scriptwriter import write_script
 from pipeline.assets import generate_assets
 from pipeline.assembly import assemble_video
 from pipeline.fact_checker import verify_claims
+from pipeline.narration import generate_narration
 
 @click.group()
 def cli():
@@ -24,6 +25,13 @@ def script(research_file, output):
 
 @cli.command()
 @click.argument('script_file')
+@click.option('--output', default='output/narration.mp3', help='Output file for narration')
+def narrate(script_file, output):
+    actual_path = generate_narration(script_file, output)
+    print(f"Narration generated at: {actual_path}")
+
+@cli.command()
+@click.argument('script_file')
 @click.option('--output-dir', default='output/assets', help='Directory for generated assets')
 def assets(script_file, output_dir):
     generate_assets(script_file, output_dir)
@@ -31,9 +39,14 @@ def assets(script_file, output_dir):
 @cli.command()
 @click.argument('asset_dir')
 @click.argument('script_file')
+@click.argument('audio_file')
 @click.option('--output', default='output/final_video.mp4', help='Final video file')
-def assemble(asset_dir, script_file, output):
-    assemble_video(asset_dir, script_file, output)
+def assemble(asset_dir, script_file, audio_file, output):
+    # If audio_file doesn't exist but a .wav version does (placeholder fallback)
+    if not os.path.exists(audio_file) and os.path.exists(audio_file.replace('.mp3', '.wav')):
+        audio_file = audio_file.replace('.mp3', '.wav')
+        
+    assemble_video(asset_dir, script_file, audio_file, output)
 
 @cli.command()
 @click.argument('script_file')
