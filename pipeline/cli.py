@@ -127,6 +127,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     except ProviderUnavailable as exc:
         _log(f"ERROR: {exc}")
         manifest["error"] = str(exc)
+        manifest["status"] = "failed"
+        manifest["publishable"] = False
+        manifest["finished_at"] = _now()
         dump_json(manifest, os.path.join(out_dir, "run.json"))
         return 2
 
@@ -244,6 +247,9 @@ def cmd_run(args: argparse.Namespace) -> int:
         status = "failed"
 
     manifest["status"] = status
+    # Only a completed, online run is deliverable: offline stubs and every
+    # failure mode must be visibly non-publishable in the manifest.
+    manifest["publishable"] = status == "completed" and not settings.offline
     manifest["finished_at"] = _now()
     manifest["stage_seconds"] = timings
     manifest["total_seconds"] = round(sum(timings.values()), 2)
