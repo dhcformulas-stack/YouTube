@@ -1,4 +1,14 @@
-click
-requests
-pillow
-moviepy
+# Pipeline runtime dependencies.
+#
+# System requirement: ffmpeg (H.264 encode + mux). Either
+#     apt-get install -y ffmpeg
+# or, where you cannot apt-install:
+#     pip install imageio-ffmpeg        # bundles a static ffmpeg binary
+# and optionally point at it with FFMPEG_BIN=/path/to/ffmpeg
+#
+# Verified on Python 3.12.3 / ffmpeg 6.1.1.
+
+requests>=2.31.0        # vendor REST calls (research, script, TTS, images)
+pillow>=10.0.0          # offline placeholder frames
+pytest>=8.0.0           # test suite (tests/)
+imageio-ffmpeg>=0.4.9   # optional ffmpeg fallback when apt is unavailable
